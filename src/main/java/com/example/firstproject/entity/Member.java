@@ -20,4 +20,8 @@ public class Member {
     private String email;
     @Column
     private String password;
+
+    public Long getId() {
+        return id;
+    }
 }
