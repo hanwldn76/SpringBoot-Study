@@ -20,6 +20,11 @@ public class MemberController {
     @Autowired
     private MemberRepository memberRepository;
 
+    @GetMapping("/members/new")
+    public String newMemberForm(){
+        return "members/new";
+    }
+
     @GetMapping("/signup")
     public String signUpPage(){
         return "members/new";
@@ -37,7 +42,7 @@ public class MemberController {
         Member saved = memberRepository.save(member);
         log.info(saved.toString());
         //System.out.println(saved.toString());
-        return "redirect:members/" + saved.getId();
+        return "redirect:/members/" + saved.getId();
     }
 
     @GetMapping("/members/{id}")
@@ -54,10 +59,27 @@ public class MemberController {
     @GetMapping("/members")
     public String index(Model model){
         // 1. id를 조회해 데이터 가져오기
-        ArrayList<Member> memberListEntity = memberRepository.findAll();
+        ArrayList<Member> members = memberRepository.findAll();
         // 2. 모델에 데이터 등록하기
-        model.addAttribute("memberList", memberListEntity);
+        model.addAttribute("members", members);
         // 3. 뷰 페이지 반환하기
         return "/members/index";
+    }
+
+    @GetMapping("/members/{id}/edit")
+    public String edit(@PathVariable Long id, Model model){
+        Member memberEntity = memberRepository.findById(id).orElse(null);
+        model.addAttribute("member", memberEntity);
+        return "/members/edit";
+    }
+
+    @PostMapping("/members/update")
+    public String update(MemberForm form){
+        Member memberEntity = form.toEntity();
+        Member target = memberRepository.findById(memberEntity.getId()).orElse(null);
+        if (target != null){
+            memberRepository.save(memberEntity);
+        }
+        return "redirect:/members/" + memberEntity.getId();
     }
 }
